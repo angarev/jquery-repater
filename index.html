@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+  
+
+    
+        <form class="name-repeater">
+            <div data-repeater-list="OtherName">
+            <div data-repeater-item style="display:none;" class="name-form-items">
+                <label for="">Field</label>
+                <input type="text" name="FirstName" data-name="OtherName[FirstName]" data-required="1"/>
+                <input data-repeater-delete type="button" value="Delete"/>    
+            </div>
+            </div>
+            <input data-repeater-create type="button" value="Add Name"/>
+        </form>
+
+        <br>
+        <br>
+        <br>
+
+
+        <form class="address-repeater">
+            <div data-repeater-list="OtherAddress">
+            <div data-repeater-item style="display:none;" class="address-form-items">
+                <label for="">Field</label> <button id="copy">Copy</button>
+                <input type="text" hidden name="Address" style="display:none;">
+                <input type="text" name="Address1" data-name="OtherAddress[Address1]" data-required="1"/>
+                <input type="text" name="Address2" data-name="OtherAddress[Address2]" data-required="1"/>
+                <input data-repeater-delete type="button" value="Delete"/>    
+            </div>
+            </div>
+            
+            <input data-repeater-create type="button" value="Add Address"/>
+        </form>
+
+        <br>
+        <br>
+        <br>
+
+
+        <form class="other-name-repeater">
+            <div data-repeater-list="OtherName">
+            <div data-repeater-item class="name-form-items">
+                <label for="">Other name:1</label>
+                <input type="text" name="OtherName[0][FirstName]" data-name="OtherName[FirstName]" data-required="1"/>
+                <input data-repeater-delete type="button" value="Delete"/>    
+            </div>
+            <div data-repeater-item class="name-form-items">
+                <label for="">Other name:2</label>
+                <input type="text" name="OtherName[1][FirstName]" data-name="OtherName[FirstName]" data-required="1"/>
+                <input data-repeater-delete type="button" value="Delete"/>    
+            </div>
+            <div data-repeater-item class="name-form-items">
+                <label for="">Other name:3</label>
+                <input type="text" name="OtherName[2][FirstName]" data-name="OtherName[FirstName]" data-required="1"/>
+                <input data-repeater-delete type="button" value="Delete"/>    
+            </div>
+            </div>
+            <input data-repeater-create type="button" value="Add Name"/>
+        </form>
+    
+
+
+  <script  src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.min.js"></script>
+
+
+
+  <script>
+    $(document).ready(function () {
+        $('.name-repeater').repeater({
+            initEmpty: true,
+            show: function () {
+                var id = getId(this);
+                $(this).find('label').html("Other name:" + id);
+                $(this).slideDown();
+            },
+            hide: function (deleteElement) {
+                $(this).slideUp({
+                    complete:deleteElement, 
+                    done: function(){ 
+                        setTimeout(function () {
+                            reindex('.name-form-items', "Other name");
+                        }, 100);
+                 }});
+            },
+            isFirstItemUndeletable: true
+        });
+        
+        
+        $('.other-name-repeater').repeater({
+            initEmpty: false,
+            show: function () {
+                var id = getId(this);
+                $(this).find('label').html("Other name:" + id);
+                $(this).slideDown();
+            },
+            hide: function (deleteElement) {
+                $(this).slideUp({
+                    complete:deleteElement, 
+                    done: function(){ 
+                        setTimeout(function () {
+                            reindex('.name-form-items', "Other name");
+                        }, 100);
+                 }});
+            },
+            isFirstItemUndeletable: false
+        });
+
+
+        $('.address-repeater').repeater({
+            initEmpty: true,
+            show: function () {
+                var id = getId(this);
+                $(this).find('label').html("Address:" + id);
+                $(this).slideDown();
+            },
+            hide: function (deleteElement) {
+                $(this).slideUp({
+                    complete:deleteElement, 
+                    done: function(){ 
+                        setTimeout(function () {
+                            reindex('.address-form-items', 'Address');
+                        }, 100);
+                    
+                 }});
+            },
+            ready: function (setIndexes) {
+                $('body').on('click', '#copy', function(event) {
+                    event.preventDefault();
+                    //Clone the clicked form
+                    var parent = $(this).parent('.address-form-items');
+                    var newClone = parent.clone();
+                    newClone.insertAfter(parent); 
+                    //Set new index to inputs
+                    setIndexes();
+                    //Reindex the label
+                    reindex('.address-form-items', 'Address');
+
+                });
+            },
+            isFirstItemUndeletable: true
+        });
+
+        /**
+        * Get id from name attr.
+        */
+        function getId(item) {
+            var id = parseInt($(item).find("input").attr("name").replace ( /[^\d.]/g, '' )) + 1;
+            return id;
+        }
+
+        /**
+        * Wrapper to handle re-indexing labels element.
+        */
+        function reindex(el, label) {
+            var list = document.querySelectorAll(el);            
+            $(list).map(function(){
+                var id = getId(this);
+                $(this).find('label').html(label + ":" + id);   
+            })
+        }
+                
+    });
+</script>
+</body>
+</html>
